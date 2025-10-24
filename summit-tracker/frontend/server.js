@@ -1,9 +1,23 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { existsSync, readdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Check if dist folder exists
+const distPath = join(__dirname, 'dist');
+console.log('Checking for dist folder at:', distPath);
+console.log('Dist folder exists:', existsSync(distPath));
+
+if (existsSync(distPath)) {
+  console.log('Contents of dist folder:', readdirSync(distPath));
+} else {
+  console.error('❌ ERROR: dist folder not found!');
+  console.log('Current directory:', __dirname);
+  console.log('Files in current directory:', readdirSync(__dirname));
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
