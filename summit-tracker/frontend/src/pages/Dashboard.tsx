@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
 
             {/* Right Column - Rapid Log */}
             <div className="lg:col-span-1">
-              <RapidLog logs={logs} goals={goals} onUpdate={loadData} />
+              <RapidLog logs={logs} onUpdate={loadData} />
             </div>
           </div>
         ) : (
