@@ -16,9 +16,14 @@ app.get('/health', (req, res) => {
 // Serve static files from dist directory
 app.use(express.static(join(__dirname, 'dist')));
 
-// Handle client-side routing - send all requests to index.html
-app.get('/*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'));
+// Fallback middleware - send all other requests to index.html (for SPA routing)
+app.use((req, res, next) => {
+  // Only send index.html for GET requests that don't match static files
+  if (req.method === 'GET') {
+    res.sendFile(join(__dirname, 'dist', 'index.html'));
+  } else {
+    next();
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
