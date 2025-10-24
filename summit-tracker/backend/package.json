@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
+    "build": "tsc && cp -r src/config/*.sql dist/config/ && cp -r src/config/migrations dist/config/ 2>/dev/null || true",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
