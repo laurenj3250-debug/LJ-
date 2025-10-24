@@ -5,6 +5,7 @@ import authRoutes from './routes/auth';
 import goalsRoutes from './routes/goals';
 import habitsRoutes from './routes/habits';
 import logsRoutes from './routes/logs';
+import { runMigrations, testConnection } from './config/migrate';
 
 dotenv.config();
 
@@ -33,9 +34,32 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🏔️  Summit Tracker API running on port ${PORT}`);
-});
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    console.log('🏔️  Starting Summit Tracker API...');
+
+    // Test database connection
+    const connected = await testConnection();
+    if (!connected) {
+      console.error('❌ Failed to connect to database');
+      process.exit(1);
+    }
+
+    // Run migrations (creates tables if they don't exist)
+    await runMigrations();
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`✅ Summit Tracker API running on port ${PORT}`);
+      console.log(`📍 Health check: http://localhost:${PORT}/health`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;

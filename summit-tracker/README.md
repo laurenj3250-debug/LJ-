@@ -29,7 +29,43 @@ A beautiful goal-tracking app combining bullet journaling with habit tracking, f
 - JWT authentication
 - bcrypt for password hashing
 
-## Getting Started
+## 🚀 Quick Deploy (iPhone-Friendly!)
+
+The easiest way to deploy Summit Tracker is using **Railway** - works great from your iPhone browser!
+
+### Deploy on Railway (5 minutes):
+
+1. **Sign up at [railway.app](https://railway.app)** (free tier available)
+2. **Click "New Project"** → "Deploy from GitHub repo"
+3. **Select your repository** and Railway auto-detects everything
+4. **Add Backend Service:**
+   - Set root directory: `summit-tracker/backend`
+   - Add environment variables:
+     - `JWT_SECRET` = `your-random-secret-key-123`
+     - `NODE_ENV` = `production`
+   - Railway auto-creates PostgreSQL and connects it!
+   - **Database tables are created automatically** on first run 🎉
+5. **Add Frontend Service:**
+   - Click "+ New" → Select same GitHub repo
+   - Set root directory: `summit-tracker/frontend`
+   - Add environment variable:
+     - `VITE_API_URL` = `https://your-backend-url.railway.app/api`
+   - Get backend URL from backend service settings
+6. **Done!** Your app is live and auto-deploys on every git push
+
+**From Claude:** When I make updates and push to GitHub, Railway automatically deploys the changes!
+
+### Other Deployment Options:
+
+- **Render**: Similar to Railway, generous free tier ([render.com](https://render.com))
+- **Vercel + Supabase**: Best for React apps with built-in PostgreSQL ([vercel.com](https://vercel.com) + [supabase.com](https://supabase.com))
+- **Heroku**: Classic PaaS with PostgreSQL add-on ([heroku.com](https://heroku.com))
+
+All options support auto-deploy from GitHub and work from iPhone Safari/Chrome!
+
+---
+
+## 💻 Local Development
 
 ### Prerequisites
 
@@ -46,10 +82,7 @@ CREATE DATABASE summit_tracker;
 \q
 ```
 
-3. Run the schema to create tables:
-```bash
-psql -U postgres -d summit_tracker -f backend/src/config/schema.sql
-```
+**Note:** Database tables are created automatically when you first start the backend! No need to run schema.sql manually.
 
 ### Backend Setup
 
