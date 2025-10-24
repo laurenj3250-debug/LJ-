@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -11,8 +11,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Build the production app (creates dist folder)
+RUN npm run build
+
 # Expose port
 EXPOSE 3000
 
-# Start dev server (for development)
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+# Start production server (serves static files from dist)
+CMD ["npm", "start"]
