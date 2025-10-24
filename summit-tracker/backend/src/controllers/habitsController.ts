@@ -16,7 +16,7 @@ export const getHabits = async (req: AuthRequest, res: Response): Promise<void> 
        LEFT JOIN goals g ON hg.goal_id = g.id
        WHERE h.user_id = $1
        GROUP BY h.id
-       ORDER BY h.created_at DESC`,
+       ORDER BY h.display_order, h.created_at DESC`,
       [userId]
     );
 
@@ -37,11 +37,18 @@ export const createHabit = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    // Get the next display_order value
+    const maxOrderResult = await query(
+      'SELECT COALESCE(MAX(display_order), -1) + 1 as next_order FROM habits WHERE user_id = $1',
+      [userId]
+    );
+    const displayOrder = maxOrderResult.rows[0].next_order;
+
     const result = await query(
-      `INSERT INTO habits (user_id, name, description, frequency, target_count, color, icon)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO habits (user_id, name, description, frequency, target_count, color, icon, display_order)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [userId, name, description, frequency || 'daily', target_count || 1, color || '#0ea5e9', icon]
+      [userId, name, description, frequency || 'daily', target_count || 1, color || '#0ea5e9', icon, displayOrder]
     );
 
     const habit = result.rows[0];
@@ -134,13 +141,13 @@ export const logHabit = async (req: AuthRequest, res: Response): Promise<void> =
   try {
     const userId = req.user?.id;
     const { id } = req.params;
-    const { note, date } = req.body;
+    const { note, date, time_spent } = req.body;
 
     const result = await query(
-      `INSERT INTO habit_logs (habit_id, user_id, note, date)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO habit_logs (habit_id, user_id, note, date, time_spent)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [id, userId, note, date || new Date().toISOString().split('T')[0]]
+      [id, userId, note, date || new Date().toISOString().split('T')[0], time_spent || 0]
     );
 
     res.status(201).json(result.rows[0]);
@@ -183,7 +190,7 @@ export const getHabitStats = async (req: AuthRequest, res: Response): Promise<vo
     // Calculate streak
     const logs = result.rows;
     let currentStreak = 0;
-    const today = new Date().toISOString().split('T')[0];
+    const todayStr = new Date().toISOString().split('T')[0];
 
     for (let i = 0; i < logs.length; i++) {
       const logDate = logs[i].log_date.toISOString().split('T')[0];
@@ -198,13 +205,43 @@ export const getHabitStats = async (req: AuthRequest, res: Response): Promise<vo
       }
     }
 
+    // Check if today is logged
+    const todayLogged = logs.some(log => log.log_date.toISOString().split('T')[0] === todayStr);
+    const streakAtRisk = currentStreak > 0 && !todayLogged;
+
     res.json({
       logs: result.rows,
       current_streak: currentStreak,
-      total_completions: logs.length
+      total_completions: logs.length,
+      streak_at_risk: streakAtRisk // Warning: streak will break if not logged today
     });
   } catch (error) {
     console.error('Get habit stats error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const reorderHabits = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const { habit_orders } = req.body; // Array of {id, display_order}
+
+    if (!Array.isArray(habit_orders)) {
+      res.status(400).json({ error: 'habit_orders must be an array' });
+      return;
+    }
+
+    // Update each habit's display_order
+    for (const { id, display_order } of habit_orders) {
+      await query(
+        'UPDATE habits SET display_order = $1 WHERE id = $2 AND user_id = $3',
+        [display_order, id, userId]
+      );
+    }
+
+    res.json({ message: 'Habits reordered successfully' });
+  } catch (error) {
+    console.error('Reorder habits error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

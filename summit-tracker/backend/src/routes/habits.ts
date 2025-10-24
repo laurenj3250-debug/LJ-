@@ -5,7 +5,8 @@ import {
   updateHabit,
   deleteHabit,
   logHabit,
-  getHabitStats
+  getHabitStats,
+  reorderHabits
 } from '../controllers/habitsController';
 import { authenticateToken } from '../middleware/auth';
 
@@ -15,6 +16,7 @@ router.use(authenticateToken);
 
 router.get('/', getHabits);
 router.post('/', createHabit);
+router.post('/reorder', reorderHabits);
 router.put('/:id', updateHabit);
 router.delete('/:id', deleteHabit);
 router.post('/:id/log', logHabit);
