@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { logsAPI } from '../services/api';
-import type { DailyLog, Goal } from '../types';
+import type { DailyLog } from '../types';
 
 interface RapidLogProps {
   logs: DailyLog[];
-  goals: Goal[];
   onUpdate: () => void;
 }
 
-const RapidLog: React.FC<RapidLogProps> = ({ logs, goals, onUpdate }) => {
+const RapidLog: React.FC<RapidLogProps> = ({ logs, onUpdate }) => {
   const [content, setContent] = useState('');
   const [entryType, setEntryType] = useState<'task' | 'event' | 'note'>('task');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | undefined>(undefined);
