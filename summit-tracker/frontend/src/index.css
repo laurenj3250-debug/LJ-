@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-granite-50 via-granite-100 to-summit-50 min-h-screen;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-summit-600 to-summit-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-granite-700 px-6 py-3 rounded-lg font-semibold shadow hover:shadow-md transition-all duration-200 border border-granite-200;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6 border border-granite-100;
+  }
+
+  .card-hover {
+    @apply bg-white rounded-xl shadow-md p-6 border border-granite-100 hover:shadow-xl transition-all duration-200 cursor-pointer;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-granite-300 focus:border-summit-500 focus:ring-2 focus:ring-summit-200 transition-all outline-none;
+  }
+
+  .label {
+    @apply block text-sm font-semibold text-granite-700 mb-2;
+  }
+}
