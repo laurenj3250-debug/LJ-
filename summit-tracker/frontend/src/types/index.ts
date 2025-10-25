@@ -23,6 +23,7 @@ export interface Habit {
   name: string;
   description?: string;
   frequency: 'daily' | 'weekly' | 'custom';
+  frequency_per_week?: number; // For "x times per week" habits
   target_count: number;
   color: string;
   icon?: string;

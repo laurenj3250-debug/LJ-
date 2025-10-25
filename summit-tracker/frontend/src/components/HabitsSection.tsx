@@ -14,16 +14,24 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    frequency: 'daily' as 'daily' | 'weekly' | 'custom',
+    frequency: 'custom' as 'daily' | 'weekly' | 'custom',
+    frequency_per_week: 3,
     color: '#666666',
-    icon: '•',
+    icon: '✓',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await habitsAPI.create(formData);
-      setFormData({ name: '', description: '', frequency: 'daily', color: '#666666', icon: '•' });
+      setFormData({
+        name: '',
+        description: '',
+        frequency: 'custom',
+        frequency_per_week: 3,
+        color: '#666666',
+        icon: '✓'
+      });
       setShowForm(false);
       onUpdate();
     } catch (error) {
@@ -49,6 +57,21 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
     { name: 'Slate', value: '#616161' },
   ];
 
+  const commonEmojis = [
+    '✓', '✔️', '📚', '🏃', '🧘', '💪', '🎯', '⭐', '🔥', '💧',
+    '🌱', '📝', '🎨', '🎵', '☕', '🥗', '🏔️', '🧗', '🎸', '📖',
+    '💻', '🎮', '🏋️', '🚴', '🏊', '🧠', '❤️', '🌟', '✨', '🌙'
+  ];
+
+  const getFrequencyText = (habit: Habit) => {
+    if (habit.frequency === 'daily') return 'Daily';
+    if (habit.frequency === 'weekly') return 'Weekly';
+    if (habit.frequency_per_week) {
+      return `${habit.frequency_per_week}× per week`;
+    }
+    return 'Custom';
+  };
+
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-6">
@@ -67,33 +90,91 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-6 p-4 bg-paper-100 border-l-4 border-ink-400">
           <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="Habit name (e.g., Practice German)"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input-field"
-              required
-            />
-
-            <input
-              type="text"
-              placeholder="Description (optional)"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input-field"
-            />
+            <div>
+              <label className="label">Habit Name</label>
+              <input
+                type="text"
+                placeholder="e.g., Practice German, Exercise, Read"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="input-field"
+                required
+              />
+            </div>
 
             <div>
-              <label className="label">Frequency</label>
-              <select
-                value={formData.frequency}
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+              <label className="label">Description (optional)</label>
+              <input
+                type="text"
+                placeholder="Any notes..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="input-field"
-              >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-              </select>
+              />
+            </div>
+
+            <div>
+              <label className="label">How often?</label>
+              <div className="flex space-x-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, frequency: 'daily', frequency_per_week: 7 })}
+                  className={`px-3 py-2 text-xs font-body transition-all border-2 ${
+                    formData.frequency === 'daily'
+                      ? 'bg-ink-800 text-paper-50 border-ink-800'
+                      : 'bg-paper-50 text-ink-700 border-ink-300 hover:border-ink-500'
+                  }`}
+                >
+                  Every Day
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, frequency: 'custom', frequency_per_week: 3 })}
+                  className={`px-3 py-2 text-xs font-body transition-all border-2 ${
+                    formData.frequency === 'custom'
+                      ? 'bg-ink-800 text-paper-50 border-ink-800'
+                      : 'bg-paper-50 text-ink-700 border-ink-300 hover:border-ink-500'
+                  }`}
+                >
+                  X Times/Week
+                </button>
+              </div>
+
+              {formData.frequency === 'custom' && (
+                <div className="mt-2">
+                  <label className="label text-xs">Times per week</label>
+                  <select
+                    value={formData.frequency_per_week}
+                    onChange={(e) => setFormData({ ...formData, frequency_per_week: parseInt(e.target.value) })}
+                    className="input-field"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7].map(num => (
+                      <option key={num} value={num}>{num} times per week</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="label">Icon/Emoji</label>
+              <div className="grid grid-cols-10 gap-1 p-2 bg-paper-50 border border-ink-200 max-h-32 overflow-y-auto">
+                {commonEmojis.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, icon: emoji })}
+                    className={`w-8 h-8 text-lg flex items-center justify-center transition-all border ${
+                      formData.icon === emoji
+                        ? 'border-ink-800 bg-ink-100'
+                        : 'border-transparent hover:border-ink-400 hover:bg-paper-100'
+                    }`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs font-body text-ink-500 mt-1">Selected: {formData.icon}</p>
             </div>
 
             <div>
@@ -138,25 +219,22 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <div
-                      className="w-2 h-2 mr-3"
-                      style={{ backgroundColor: habit.color }}
-                    />
+                    <span className="text-2xl mr-3">{habit.icon || '✓'}</span>
                     <div>
                       <h4 className="font-display text-ink-900">{habit.name}</h4>
                       {habit.description && (
                         <p className="text-sm font-body text-ink-600 mt-1">{habit.description}</p>
                       )}
-                      <p className="text-xs font-body text-ink-500 mt-1 capitalize">{habit.frequency}</p>
+                      <p className="text-xs font-body text-ink-500 mt-1">{getFrequencyText(habit)}</p>
                     </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => logHabit(habit.id)}
-                  className="btn-secondary text-xs px-3 py-1"
+                  className="btn-secondary text-xs px-4 py-2"
                 >
-                  ✓ Log Today
+                  ✓ Check Off
                 </button>
               </div>
             </div>
