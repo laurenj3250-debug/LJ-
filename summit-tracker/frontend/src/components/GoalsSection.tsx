@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { goalsAPI } from '../services/api';
 import type { Goal } from '../types';
+import { Carabiner, MountainLine } from './LineArt';
 
 interface GoalsSectionProps {
   goals: Goal[];
@@ -54,47 +55,49 @@ const GoalsSection: React.FC<GoalsSectionProps> = ({ goals, onUpdate }) => {
   const monthlyGoals = goals.filter(g => g.goal_type === 'monthly' && g.status === 'active');
   const weeklyGoals = goals.filter(g => g.goal_type === 'weekly' && g.status === 'active');
 
-  const renderGoalsList = (goalsList: Goal[], type: string, emoji: string) => (
+  const renderGoalsList = (goalsList: Goal[], type: string) => (
     <div className="mb-6">
-      <h3 className="text-lg font-bold text-granite-800 mb-3 flex items-center">
-        <span className="mr-2">{emoji}</span>
-        {type} Goals
+      <h3 className="text-base font-display text-ink-800 mb-3 tracking-wide border-b border-ink-200 pb-2">
+        {type} Objectives
       </h3>
       {goalsList.length === 0 ? (
-        <p className="text-granite-500 italic">No {type.toLowerCase()} goals yet</p>
+        <p className="text-ink-400 italic font-body text-sm">No {type.toLowerCase()} goals set</p>
       ) : (
         <div className="space-y-3">
           {goalsList.map((goal) => (
-            <div key={goal.id} className="bg-gradient-to-r from-white to-summit-50 rounded-lg p-4 border border-summit-200 shadow-sm">
+            <div key={goal.id} className="bg-paper-50 p-4 border-l-2 border-ink-400">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-granite-800">{goal.title}</h4>
+                  <h4 className="font-display text-ink-900">{goal.title}</h4>
                   {goal.description && (
-                    <p className="text-sm text-granite-600 mt-1">{goal.description}</p>
+                    <p className="text-sm font-body text-ink-600 mt-1">{goal.description}</p>
                   )}
                   {goal.target_date && (
-                    <p className="text-xs text-summit-600 mt-1">
+                    <p className="text-xs font-body text-ink-500 mt-1">
                       Target: {new Date(goal.target_date).toLocaleDateString()}
                     </p>
                   )}
                 </div>
                 <button
                   onClick={() => toggleStatus(goal.id, goal.status)}
-                  className="ml-2 text-2xl hover:scale-110 transition-transform"
+                  className="ml-2 w-6 h-6 border-2 border-ink-400 flex items-center justify-center hover:bg-ink-100 transition-all"
+                  title={goal.status === 'completed' ? 'Mark as active' : 'Mark as completed'}
                 >
-                  {goal.status === 'completed' ? '✅' : '⭕'}
+                  {goal.status === 'completed' && (
+                    <span className="text-ink-800 font-body text-sm">✓</span>
+                  )}
                 </button>
               </div>
 
               {/* Progress Bar */}
               <div className="mt-3">
-                <div className="flex items-center justify-between text-xs text-granite-600 mb-1">
+                <div className="flex items-center justify-between text-xs font-body text-ink-600 mb-1">
                   <span>Progress</span>
                   <span>{goal.progress}%</span>
                 </div>
-                <div className="w-full bg-granite-200 rounded-full h-2">
+                <div className="w-full bg-paper-200 h-1">
                   <div
-                    className="bg-gradient-to-r from-summit-500 to-summit-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-ink-700 h-1 transition-all duration-300"
                     style={{ width: `${goal.progress}%` }}
                   />
                 </div>
@@ -104,7 +107,7 @@ const GoalsSection: React.FC<GoalsSectionProps> = ({ goals, onUpdate }) => {
                   max="100"
                   value={goal.progress}
                   onChange={(e) => updateProgress(goal.id, parseInt(e.target.value))}
-                  className="w-full mt-2 cursor-pointer"
+                  className="w-full mt-2 cursor-pointer accent-ink-700"
                 />
               </div>
             </div>
@@ -117,27 +120,30 @@ const GoalsSection: React.FC<GoalsSectionProps> = ({ goals, onUpdate }) => {
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-granite-800 flex items-center">
-          <span className="mr-2">🎯</span>
-          Your Goals
-        </h2>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          {showForm ? 'Cancel' : '+ New Goal'}
+        <div>
+          <h2 className="text-xl font-display text-ink-900 flex items-center tracking-wide">
+            <Carabiner className="w-6 h-6 mr-2 text-ink-600" />
+            Goals
+          </h2>
+          <MountainLine className="w-32 h-4 text-ink-300 mt-1" />
+        </div>
+        <button onClick={() => setShowForm(!showForm)} className="btn-primary text-xs">
+          {showForm ? '× Close' : '+ New'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-summit-50 rounded-lg border border-summit-200">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-paper-100 border-l-4 border-ink-400">
           <div className="flex space-x-2 mb-4">
             {(['yearly', 'monthly', 'weekly'] as const).map((type) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => setGoalType(type)}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                className={`px-3 py-1 text-xs font-body transition-all border-2 ${
                   goalType === type
-                    ? 'bg-summit-600 text-white'
-                    : 'bg-white text-granite-700 border border-granite-300'
+                    ? 'bg-ink-800 text-paper-50 border-ink-800'
+                    : 'bg-paper-50 text-ink-700 border-ink-300 hover:border-ink-500'
                 }`}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -174,9 +180,9 @@ const GoalsSection: React.FC<GoalsSectionProps> = ({ goals, onUpdate }) => {
         </form>
       )}
 
-      {renderGoalsList(yearlyGoals, 'Yearly', '🏔️')}
-      {renderGoalsList(monthlyGoals, 'Monthly', '⛰️')}
-      {renderGoalsList(weeklyGoals, 'Weekly', '🧗')}
+      {renderGoalsList(yearlyGoals, 'Yearly')}
+      {renderGoalsList(monthlyGoals, 'Monthly')}
+      {renderGoalsList(weeklyGoals, 'Weekly')}
     </div>
   );
 };
