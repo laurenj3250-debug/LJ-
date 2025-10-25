@@ -11,6 +11,8 @@ interface HabitsSectionProps {
 
 const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
   const [showForm, setShowForm] = useState(false);
+  const [justLogged, setJustLogged] = useState<number | null>(null);
+  const [loading, setLoading] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -41,10 +43,16 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
 
   const logHabit = async (habitId: number) => {
     try {
+      setLoading(habitId);
       await habitsAPI.log(habitId, { date: format(new Date(), 'yyyy-MM-dd') });
-      onUpdate();
+      setJustLogged(habitId);
+      setTimeout(() => setJustLogged(null), 2000); // Show success for 2 seconds
+      await onUpdate();
     } catch (error) {
       console.error('Error logging habit:', error);
+      alert('Failed to log habit. Please try again.');
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -232,9 +240,16 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
 
                 <button
                   onClick={() => logHabit(habit.id)}
-                  className="btn-secondary text-xs px-4 py-2"
+                  disabled={loading === habit.id || justLogged === habit.id}
+                  className={`text-xs px-4 py-2 font-body border-2 transition-all ${
+                    justLogged === habit.id
+                      ? 'bg-ink-800 text-paper-50 border-ink-800'
+                      : loading === habit.id
+                      ? 'bg-paper-200 text-ink-400 border-ink-200 cursor-wait'
+                      : 'bg-paper-50 text-ink-700 border-ink-300 hover:border-ink-500'
+                  }`}
                 >
-                  ✓ Check Off
+                  {justLogged === habit.id ? '✓ Logged!' : loading === habit.id ? 'Logging...' : '✓ Check Off'}
                 </button>
               </div>
             </div>

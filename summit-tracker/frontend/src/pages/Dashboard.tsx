@@ -97,6 +97,10 @@ const Dashboard: React.FC = () => {
                 </button>
               </div>
 
+              <a href="/statistics" className="text-ink-600 hover:text-ink-900 font-body text-sm border-b border-ink-400">
+                📊 Statistics
+              </a>
+
               <button onClick={logout} className="text-ink-600 hover:text-ink-900 font-body text-sm border-b border-ink-400">
                 Sign Out
               </button>
