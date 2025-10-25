@@ -54,6 +54,25 @@ export interface DailyLog {
   updated_at: string;
 }
 
+export interface Event {
+  id: number;
+  user_id: number;
+  title: string;
+  description?: string;
+  event_type: 'event' | 'task' | 'climbing_session' | 'training' | 'rest_day';
+  start_time: string;
+  end_time?: string;
+  all_day: boolean;
+  location?: string;
+  color: string;
+  icon?: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  goal_id?: number;
+  linked_goal?: { id: number; title: string; goal_type: string };
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;

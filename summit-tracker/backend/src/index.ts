@@ -6,6 +6,7 @@ import goalsRoutes from './routes/goals';
 import habitsRoutes from './routes/habits';
 import logsRoutes from './routes/logs';
 import moodRoutes from './routes/mood';
+import eventsRoutes from './routes/events';
 import { runMigrations, testConnection } from './config/migrate';
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.use('/api/goals', goalsRoutes);
 app.use('/api/habits', habitsRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/mood', moodRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

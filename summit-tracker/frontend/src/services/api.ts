@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, Goal, Habit, DailyLog } from '../types';
+import type { AuthResponse, Goal, Habit, DailyLog, Event } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://lj-production.up.railway.app/api';
 
@@ -80,6 +80,21 @@ export const logsAPI = {
 
   delete: (id: number) =>
     api.delete(`/logs/${id}`),
+};
+
+// Events API
+export const eventsAPI = {
+  getAll: (start_date?: string, end_date?: string, type?: string, status?: string) =>
+    api.get<Event[]>('/events', { params: { start_date, end_date, type, status } }),
+
+  create: (data: Partial<Event>) =>
+    api.post<Event>('/events', data),
+
+  update: (id: number, data: Partial<Event>) =>
+    api.put<Event>(`/events/${id}`, data),
+
+  delete: (id: number) =>
+    api.delete(`/events/${id}`),
 };
 
 export default api;

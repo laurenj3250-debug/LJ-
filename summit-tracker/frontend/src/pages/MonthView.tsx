@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, parseISO, isWithinInterval } from 'date-fns';
-import type { Goal, Habit, HabitLog } from '../types';
-import { MountainLine, CornerSwirl, Carabiner } from '../components/LineArt';
+import type { Goal, Habit, HabitLog, Event } from '../types';
+import { SketchyMountains, CornerSwirl, Carabiner } from '../components/LineArt';
+import EventModal from '../components/EventModal';
+import { eventsAPI } from '../services/api';
 
 interface MonthViewProps {
   goals: Goal[];
@@ -11,10 +13,29 @@ interface MonthViewProps {
 
 const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedEvent, setSelectedEvent] = useState<Event | undefined>();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  useEffect(() => {
+    loadEvents();
+  }, [currentMonth]);
+
+  const loadEvents = async () => {
+    try {
+      const startDate = format(monthStart, 'yyyy-MM-dd');
+      const endDate = format(monthEnd, 'yyyy-MM-dd');
+      const res = await eventsAPI.getAll(startDate, endDate);
+      setEvents(res.data);
+    } catch (error) {
+      console.error('Error loading events:', error);
+    }
+  };
 
   // Get the day of week for the first day (0 = Sunday, 6 = Saturday)
   const firstDayOfWeek = monthStart.getDay();
@@ -34,6 +55,33 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
       const logDate = parseISO(log.date.toString());
       return isSameDay(logDate, date);
     });
+  };
+
+  // Get events for a specific date
+  const getEventsForDate = (date: Date) => {
+    return events.filter(event => {
+      const eventDate = parseISO(event.start_time);
+      return isSameDay(eventDate, date);
+    });
+  };
+
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedEvent(undefined);
+    setShowEventModal(true);
+  };
+
+  const handleEventClick = (event: Event, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedEvent(event);
+    setSelectedDate(undefined);
+    setShowEventModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowEventModal(false);
+    setSelectedDate(undefined);
+    setSelectedEvent(undefined);
   };
 
   // Check if a date falls within a goal's timeframe
@@ -73,7 +121,7 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
             <h1 className="text-3xl font-display text-ink-800 tracking-wide">
               {format(currentMonth, 'MMMM yyyy')}
             </h1>
-            <MountainLine className="w-48 h-8 mx-auto mt-2 text-ink-400" />
+            <SketchyMountains className="w-64 h-10 mx-auto mt-2 text-ink-400" />
           </div>
 
           <button
@@ -128,12 +176,14 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
           {daysInMonth.map(day => {
             const dayGoals = getGoalsForDate(day);
             const dayHabitLogs = getHabitLogsForDate(day);
+            const dayEvents = getEventsForDate(day);
             const isToday = isSameDay(day, new Date());
 
             return (
               <div
                 key={day.toISOString()}
-                className={`bg-paper-50 p-2 min-h-[120px] relative transition-all hover:shadow-md ${
+                onClick={() => handleDayClick(day)}
+                className={`bg-paper-50 p-2 min-h-[120px] relative transition-all hover:shadow-md hover:bg-ink-50 cursor-pointer ${
                   isToday ? 'ring-2 ring-ink-400' : ''
                 }`}
               >
@@ -144,10 +194,33 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
                   {format(day, 'd')}
                 </div>
 
+                {/* Events for this day */}
+                {dayEvents.length > 0 && (
+                  <div className="space-y-1 mb-2">
+                    {dayEvents.slice(0, 3).map(event => (
+                      <div
+                        key={event.id}
+                        onClick={(e) => handleEventClick(event, e)}
+                        className="text-xs p-1 border-l-2 font-body truncate hover:bg-ink-100 transition-all"
+                        style={{ borderColor: event.color, backgroundColor: `${event.color}15` }}
+                        title={`${event.icon} ${event.title}`}
+                      >
+                        <span className="mr-1">{event.icon}</span>
+                        {event.title}
+                      </div>
+                    ))}
+                    {dayEvents.length > 3 && (
+                      <div className="text-xs text-ink-400 font-body">
+                        +{dayEvents.length - 3} more
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Goals for this day */}
                 {dayGoals.length > 0 && (
                   <div className="space-y-1 mb-2">
-                    {dayGoals.slice(0, 2).map(goal => (
+                    {dayGoals.slice(0, 1).map(goal => (
                       <div
                         key={goal.id}
                         className="text-xs p-1 bg-ink-100 border-l-2 border-ink-400 font-body truncate"
@@ -156,11 +229,6 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
                         {goal.title}
                       </div>
                     ))}
-                    {dayGoals.length > 2 && (
-                      <div className="text-xs text-ink-400 font-body">
-                        +{dayGoals.length - 2} more
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -193,7 +261,26 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
             ))}
           </div>
         </div>
+
+        {/* Add Event Button */}
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => { setSelectedDate(new Date()); setShowEventModal(true); }}
+            className="px-6 py-2 border-2 border-ink-800 bg-ink-800 text-paper-50 font-body text-sm hover:bg-ink-700 transition-all"
+          >
+            + Create Event
+          </button>
+        </div>
       </div>
+
+      {/* Event Modal */}
+      <EventModal
+        isOpen={showEventModal}
+        onClose={handleCloseModal}
+        onUpdate={loadEvents}
+        event={selectedEvent}
+        initialDate={selectedDate}
+      />
     </div>
   );
 };

@@ -56,11 +56,21 @@ const WeekView: React.FC<WeekViewProps> = ({ goals, habits }) => {
   };
 
   const logHabit = async (habitId: number, date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const isLogged = isHabitLoggedForDay(habitId, date);
+
     try {
-      await habitsAPI.log(habitId, { date: format(date, 'yyyy-MM-dd') });
+      if (isLogged) {
+        // Uncheck - delete the log
+        await habitsAPI.deleteLog(habitId, dateStr);
+      } else {
+        // Check - create the log
+        await habitsAPI.log(habitId, { date: dateStr });
+      }
       loadWeekData();
     } catch (error) {
-      console.error('Error logging habit:', error);
+      console.error('Error toggling habit:', error);
+      alert(`Failed to ${isLogged ? 'uncheck' : 'log'} habit. Please try again.`);
     }
   };
 
@@ -151,13 +161,13 @@ const WeekView: React.FC<WeekViewProps> = ({ goals, habits }) => {
                           }`}
                         >
                           <button
-                            onClick={() => !isLogged && logHabit(habit.id, day)}
+                            onClick={() => logHabit(habit.id, day)}
                             className={`w-8 h-8 transition-all font-body text-sm ${
                               isLogged
-                                ? 'bg-ink-700 text-paper-50 border-2 border-ink-700'
+                                ? 'bg-ink-700 text-paper-50 border-2 border-ink-700 hover:bg-ink-600 cursor-pointer'
                                 : 'bg-transparent border-2 border-ink-300 text-ink-400 hover:border-ink-500'
                             }`}
-                            disabled={isLogged}
+                            title={isLogged ? 'Click to uncheck' : 'Click to check off'}
                           >
                             {isLogged ? '✓' : ''}
                           </button>
