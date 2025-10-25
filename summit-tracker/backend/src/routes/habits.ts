@@ -5,6 +5,7 @@ import {
   updateHabit,
   deleteHabit,
   logHabit,
+  deleteHabitLog,
   getHabitStats,
   reorderHabits
 } from '../controllers/habitsController';
@@ -20,6 +21,7 @@ router.post('/reorder', reorderHabits);
 router.put('/:id', updateHabit);
 router.delete('/:id', deleteHabit);
 router.post('/:id/log', logHabit);
+router.delete('/:id/log', deleteHabitLog);
 router.get('/:id/stats', getHabitStats);
 
 export default router;

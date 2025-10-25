@@ -1,5 +1,80 @@
 import React from 'react';
 
+// El Capitan - massive vertical cliff face (Yosemite icon)
+export const ElCapitan: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main cliff face - sketchy style */}
+    <path
+      d="M50 400 L50 50 Q55 48, 58 52 L58 85 Q62 82, 65 90 L65 130 Q68 127, 72 138 L72 190 Q75 187, 78 200 L78 260 Q80 257, 83 270 L83 400 Z"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      opacity="0.25"
+      strokeLinecap="round"
+    />
+    {/* Sketchy vertical cracks */}
+    <path d="M54 100 Q56 150, 54 250" stroke="currentColor" strokeWidth="0.8" opacity="0.15" strokeLinecap="round" />
+    <path d="M68 120 Q70 180, 68 300" stroke="currentColor" strokeWidth="0.8" opacity="0.15" strokeLinecap="round" />
+    <path d="M78 90 Q80 160, 78 280" stroke="currentColor" strokeWidth="0.8" opacity="0.15" strokeLinecap="round" />
+    {/* Horizontal features - ledges */}
+    <path d="M50 160 Q60 158, 83 160" stroke="currentColor" strokeWidth="0.6" opacity="0.12" strokeLinecap="round" />
+    <path d="M50 260 Q60 258, 83 260" stroke="currentColor" strokeWidth="0.6" opacity="0.12" strokeLinecap="round" />
+  </svg>
+);
+
+// Half Dome - iconic rounded granite dome
+export const HalfDome: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main dome shape - sketchy */}
+    <path
+      d="M20 200 L20 120 Q22 82, 42 62 Q62 42, 100 40 Q138 42, 158 62 Q178 82, 180 120 L180 200 Z"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      opacity="0.22"
+      strokeLinecap="round"
+    />
+    {/* Sketchy texture lines */}
+    <path d="M45 125 Q52 115, 58 125" stroke="currentColor" strokeWidth="0.7" opacity="0.12" strokeLinecap="round" />
+    <path d="M72 105 Q82 95, 92 105" stroke="currentColor" strokeWidth="0.7" opacity="0.12" strokeLinecap="round" />
+    <path d="M108 105 Q118 95, 128 105" stroke="currentColor" strokeWidth="0.7" opacity="0.12" strokeLinecap="round" />
+    <path d="M142 125 Q152 115, 158 125" stroke="currentColor" strokeWidth="0.7" opacity="0.12" strokeLinecap="round" />
+    {/* Vertical striations */}
+    <path d="M65 85 Q68 130, 62 185" stroke="currentColor" strokeWidth="0.6" opacity="0.08" strokeLinecap="round" />
+    <path d="M100 52 Q103 110, 100 180" stroke="currentColor" strokeWidth="0.6" opacity="0.08" strokeLinecap="round" />
+    <path d="M135 85 Q138 130, 135 185" stroke="currentColor" strokeWidth="0.6" opacity="0.08" strokeLinecap="round" />
+  </svg>
+);
+
+// Sketchy mountain range - hand-drawn style
+export const SketchyMountains: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    {/* Main peaks - very sketchy */}
+    <path
+      d="M0 200 L45 165 L50 170 L75 130 L80 135 L115 70 L120 75 L145 95 L150 90 L185 45 L190 50 L220 75 L225 70 L260 30 L265 35 L300 65 L305 60 L340 90 L345 85 L380 50 L385 55 L420 85 L425 80 L460 110 L465 105 L500 130 L505 125 L540 150 L545 145 L580 165 L585 160 L600 175 L600 200 Z"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      fill="none"
+      opacity="0.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Shadow layer */}
+    <path
+      d="M0 200 L50 168 L120 73 L190 48 L265 33 L340 88 L425 78 L505 123 L600 173"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      opacity="0.12"
+      strokeLinecap="round"
+    />
+    {/* Detail textures */}
+    <path d="M115 70 L110 120" stroke="currentColor" strokeWidth="0.8" opacity="0.08" strokeLinecap="round" />
+    <path d="M185 45 L180 100" stroke="currentColor" strokeWidth="0.8" opacity="0.08" strokeLinecap="round" />
+    <path d="M260 30 L255 90" stroke="currentColor" strokeWidth="0.8" opacity="0.08" strokeLinecap="round" />
+  </svg>
+);
+
 // Mountain silhouette line art
 export const MountainLine: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg className={className} viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">

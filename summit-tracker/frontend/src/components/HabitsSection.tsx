@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { habitsAPI } from '../services/api';
 import type { Habit } from '../types';
 import { format } from 'date-fns';
@@ -13,6 +13,7 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
   const [showForm, setShowForm] = useState(false);
   const [justLogged, setJustLogged] = useState<number | null>(null);
   const [loading, setLoading] = useState<number | null>(null);
+  const [loggedToday, setLoggedToday] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -21,6 +22,28 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
     color: '#666666',
     icon: '✓',
   });
+
+  useEffect(() => {
+    checkTodayLogs();
+  }, [habits]);
+
+  const checkTodayLogs = async () => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const loggedSet = new Set<number>();
+
+    for (const habit of habits) {
+      try {
+        const statsRes = await habitsAPI.getStats(habit.id, today, today);
+        if (statsRes.data.logs && statsRes.data.logs.length > 0) {
+          loggedSet.add(habit.id);
+        }
+      } catch (error) {
+        console.error(`Error checking logs for habit ${habit.id}:`, error);
+      }
+    }
+
+    setLoggedToday(loggedSet);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,15 +65,32 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
   };
 
   const logHabit = async (habitId: number) => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const isAlreadyLogged = loggedToday.has(habitId);
+
     try {
       setLoading(habitId);
-      await habitsAPI.log(habitId, { date: format(new Date(), 'yyyy-MM-dd') });
-      setJustLogged(habitId);
-      setTimeout(() => setJustLogged(null), 2000); // Show success for 2 seconds
+
+      if (isAlreadyLogged) {
+        // Uncheck - delete the log
+        await habitsAPI.deleteLog(habitId, today);
+        setLoggedToday(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(habitId);
+          return newSet;
+        });
+      } else {
+        // Check off - create the log
+        await habitsAPI.log(habitId, { date: today });
+        setLoggedToday(prev => new Set(prev).add(habitId));
+        setJustLogged(habitId);
+        setTimeout(() => setJustLogged(null), 2000); // Show success for 2 seconds
+      }
+
       await onUpdate();
     } catch (error) {
       console.error('Error logging habit:', error);
-      alert('Failed to log habit. Please try again.');
+      alert(`Failed to ${isAlreadyLogged ? 'uncheck' : 'log'} habit. Please try again.`);
     } finally {
       setLoading(null);
     }
@@ -240,16 +280,24 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
 
                 <button
                   onClick={() => logHabit(habit.id)}
-                  disabled={loading === habit.id || justLogged === habit.id}
+                  disabled={loading === habit.id}
                   className={`text-xs px-4 py-2 font-body border-2 transition-all ${
                     justLogged === habit.id
                       ? 'bg-ink-800 text-paper-50 border-ink-800'
                       : loading === habit.id
                       ? 'bg-paper-200 text-ink-400 border-ink-200 cursor-wait'
+                      : loggedToday.has(habit.id)
+                      ? 'bg-ink-700 text-paper-50 border-ink-700 hover:bg-ink-600'
                       : 'bg-paper-50 text-ink-700 border-ink-300 hover:border-ink-500'
                   }`}
                 >
-                  {justLogged === habit.id ? '✓ Logged!' : loading === habit.id ? 'Logging...' : '✓ Check Off'}
+                  {justLogged === habit.id
+                    ? '✓ Logged!'
+                    : loading === habit.id
+                    ? (loggedToday.has(habit.id) ? 'Unchecking...' : 'Logging...')
+                    : loggedToday.has(habit.id)
+                    ? '✓ Uncheck'
+                    : '✓ Check Off'}
                 </button>
               </div>
             </div>

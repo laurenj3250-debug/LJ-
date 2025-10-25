@@ -157,6 +157,34 @@ export const logHabit = async (req: AuthRequest, res: Response): Promise<void> =
   }
 };
 
+export const deleteHabitLog = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const { date } = req.body;
+
+    if (!date) {
+      res.status(400).json({ error: 'Date is required' });
+      return;
+    }
+
+    const result = await query(
+      'DELETE FROM habit_logs WHERE habit_id = $1 AND user_id = $2 AND DATE(date) = $3 RETURNING *',
+      [id, userId, date]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Habit log not found for this date' });
+      return;
+    }
+
+    res.json({ message: 'Habit log deleted successfully' });
+  } catch (error) {
+    console.error('Delete habit log error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const getHabitStats = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;

@@ -7,7 +7,7 @@ import HabitsSection from '../components/HabitsSection';
 import RapidLog from '../components/RapidLog';
 import WeekView from '../components/WeekView';
 import MonthView from './MonthView';
-import { MountainLine, CornerSwirl } from '../components/LineArt';
+import { SketchyMountains, CornerSwirl, ElCapitan, HalfDome } from '../components/LineArt';
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
@@ -50,15 +50,17 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-paper-100">
       {/* Header */}
-      <header className="bg-paper-50 border-b-2 border-ink-200 shadow-sm relative">
+      <header className="bg-paper-50 border-b-2 border-ink-200 shadow-sm relative overflow-hidden">
         <CornerSwirl className="absolute top-2 left-4 w-12 h-12 text-ink-200" />
         <CornerSwirl className="absolute top-2 right-4 w-12 h-12 text-ink-200" flip />
+        <ElCapitan className="absolute right-0 top-0 h-full w-20 text-ink-200 opacity-40" />
+        <HalfDome className="absolute left-0 top-0 h-24 w-24 text-ink-200 opacity-30" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-display text-ink-900 tracking-wide">Climbing Journal</h1>
-              <MountainLine className="w-48 h-6 text-ink-400 mt-1" />
+              <SketchyMountains className="w-64 h-8 text-ink-400 mt-1" />
               <p className="text-sm font-body text-ink-600 mt-2">{user?.name}'s logbook</p>
             </div>
 

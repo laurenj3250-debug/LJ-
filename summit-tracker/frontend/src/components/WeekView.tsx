@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { habitsAPI, logsAPI } from '../services/api';
 import type { Goal, Habit, DailyLog } from '../types';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
-import { MountainLine, Carabiner, ClimbingHold } from './LineArt';
+import { SketchyMountains, Carabiner, ClimbingHold } from './LineArt';
 
 interface WeekViewProps {
   goals: Goal[];
@@ -78,7 +78,7 @@ const WeekView: React.FC<WeekViewProps> = ({ goals, habits }) => {
               <Carabiner className="w-6 h-6 mr-2 text-ink-600" />
               This Week's Objectives
             </h2>
-            <MountainLine className="w-full h-6 text-ink-300 mb-4" />
+            <SketchyMountains className="w-full h-10 text-ink-300 mb-4" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {weeklyGoals.map((goal) => (
                 <div key={goal.id} className="bg-paper-100 p-4 border-l-2 border-ink-400">

@@ -60,6 +60,9 @@ export const habitsAPI = {
   log: (id: number, data: { note?: string; date?: string }) =>
     api.post(`/habits/${id}/log`, data),
 
+  deleteLog: (id: number, date: string) =>
+    api.delete(`/habits/${id}/log`, { data: { date } }),
+
   getStats: (id: number, start_date?: string, end_date?: string) =>
     api.get(`/habits/${id}/stats`, { params: { start_date, end_date } }),
 };

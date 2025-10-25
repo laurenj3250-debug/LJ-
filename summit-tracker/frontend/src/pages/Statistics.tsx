@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { goalsAPI, habitsAPI } from '../services/api';
 import type { Goal, Habit } from '../types';
 import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
-import { MountainLine, CornerSwirl, Carabiner, ClimbingHold, RopeSwirl } from '../components/LineArt';
+import { SketchyMountains, CornerSwirl, Carabiner, ClimbingHold, RopeSwirl, ElCapitan, HalfDome } from '../components/LineArt';
 
 const Statistics: React.FC = () => {
   const { user } = useAuth();
@@ -88,15 +88,17 @@ const Statistics: React.FC = () => {
   return (
     <div className="min-h-screen bg-paper-100">
       {/* Header */}
-      <header className="bg-paper-50 border-b-2 border-ink-200 shadow-sm relative">
+      <header className="bg-paper-50 border-b-2 border-ink-200 shadow-sm relative overflow-hidden">
         <CornerSwirl className="absolute top-2 left-4 w-12 h-12 text-ink-200" />
         <CornerSwirl className="absolute top-2 right-4 w-12 h-12 text-ink-200" flip />
+        <HalfDome className="absolute right-0 top-0 h-full w-32 text-ink-200 opacity-35" />
+        <ElCapitan className="absolute left-0 top-0 h-full w-16 text-ink-200 opacity-30" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-display text-ink-900 tracking-wide">Statistics & Progress</h1>
-              <MountainLine className="w-48 h-6 text-ink-400 mt-1" />
+              <SketchyMountains className="w-64 h-8 text-ink-400 mt-1" />
               <p className="text-sm font-body text-ink-600 mt-2">{user?.name}'s journey</p>
             </div>
 
@@ -115,7 +117,7 @@ const Statistics: React.FC = () => {
               <Carabiner className="w-8 h-8 mr-3 text-ink-600" />
               Goal Progress
             </h2>
-            <MountainLine className="w-full h-8 text-ink-300 mb-6" />
+            <SketchyMountains className="w-full h-12 text-ink-300 mb-6" />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Yearly Goals */}
