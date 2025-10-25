@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { habitsAPI } from '../services/api';
 import type { Habit } from '../types';
 import { format } from 'date-fns';
+import { ClimbingHold, RopeKnot } from './LineArt';
 
 interface HabitsSectionProps {
   habits: Habit[];
@@ -14,15 +15,15 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
     name: '',
     description: '',
     frequency: 'daily' as 'daily' | 'weekly' | 'custom',
-    color: '#0ea5e9',
-    icon: '✓',
+    color: '#666666',
+    icon: '•',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await habitsAPI.create(formData);
-      setFormData({ name: '', description: '', frequency: 'daily', color: '#0ea5e9', icon: '✓' });
+      setFormData({ name: '', description: '', frequency: 'daily', color: '#666666', icon: '•' });
       setShowForm(false);
       onUpdate();
     } catch (error) {
@@ -40,28 +41,31 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
   };
 
   const colors = [
-    { name: 'Blue', value: '#0ea5e9' },
-    { name: 'Green', value: '#10b981' },
-    { name: 'Purple', value: '#8b5cf6' },
-    { name: 'Orange', value: '#f59e0b' },
-    { name: 'Red', value: '#ef4444' },
-    { name: 'Pink', value: '#ec4899' },
+    { name: 'Charcoal', value: '#666666' },
+    { name: 'Dark Grey', value: '#757575' },
+    { name: 'Medium', value: '#9e9e9e' },
+    { name: 'Light', value: '#bdbdbd' },
+    { name: 'Graphite', value: '#515151' },
+    { name: 'Slate', value: '#616161' },
   ];
 
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-granite-800 flex items-center">
-          <span className="mr-2">🎯</span>
-          Daily Habits
-        </h2>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          {showForm ? 'Cancel' : '+ New Habit'}
+        <div>
+          <h2 className="text-xl font-display text-ink-900 flex items-center tracking-wide">
+            <ClimbingHold className="w-6 h-6 mr-2 text-ink-600" />
+            Daily Habits
+          </h2>
+          <RopeKnot className="w-8 h-8 text-ink-300 mt-1" />
+        </div>
+        <button onClick={() => setShowForm(!showForm)} className="btn-primary text-xs">
+          {showForm ? '× Close' : '+ New'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-summit-50 rounded-lg border border-summit-200">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-paper-100 border-l-4 border-ink-400">
           <div className="space-y-3">
             <input
               type="text"
@@ -100,8 +104,10 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
                     key={color.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, color: color.value })}
-                    className={`w-10 h-10 rounded-full border-2 transition-all ${
-                      formData.color === color.value ? 'border-granite-800 scale-110' : 'border-granite-300'
+                    className={`w-8 h-8 border-2 transition-all ${
+                      formData.color === color.value
+                        ? 'border-ink-800 scale-110'
+                        : 'border-ink-300 hover:border-ink-500'
                     }`}
                     style={{ backgroundColor: color.value }}
                     title={color.name}
@@ -117,58 +123,46 @@ const HabitsSection: React.FC<HabitsSectionProps> = ({ habits, onUpdate }) => {
         </form>
       )}
 
-      {habits.length === 0 ? (
-        <p className="text-granite-500 italic text-center py-8">
-          No habits yet. Create one to start tracking!
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {habits.map((habit) => (
+      <div className="space-y-3">
+        {habits.length === 0 ? (
+          <p className="text-center text-ink-400 italic py-8 font-body text-sm">
+            No habits yet. Create one to start tracking!
+          </p>
+        ) : (
+          habits.map((habit) => (
             <div
               key={habit.id}
-              className="rounded-lg p-4 border-2 shadow-sm hover:shadow-md transition-all cursor-pointer"
+              className="bg-paper-50 p-4 border-l-4 hover:border-ink-600 transition-all"
               style={{ borderColor: habit.color }}
             >
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-granite-800">{habit.name}</h4>
-                  {habit.description && (
-                    <p className="text-sm text-granite-600 mt-1">{habit.description}</p>
-                  )}
-                  <div className="flex items-center mt-2 text-xs text-granite-500">
-                    <span className="bg-granite-100 px-2 py-1 rounded">
-                      {habit.frequency}
-                    </span>
+                  <div className="flex items-center">
+                    <div
+                      className="w-2 h-2 mr-3"
+                      style={{ backgroundColor: habit.color }}
+                    />
+                    <div>
+                      <h4 className="font-display text-ink-900">{habit.name}</h4>
+                      {habit.description && (
+                        <p className="text-sm font-body text-ink-600 mt-1">{habit.description}</p>
+                      )}
+                      <p className="text-xs font-body text-ink-500 mt-1 capitalize">{habit.frequency}</p>
+                    </div>
                   </div>
                 </div>
+
                 <button
                   onClick={() => logHabit(habit.id)}
-                  className="ml-2 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl hover:scale-110 transition-transform shadow-md"
-                  style={{ backgroundColor: habit.color }}
+                  className="btn-secondary text-xs px-3 py-1"
                 >
-                  ✓
+                  ✓ Log Today
                 </button>
               </div>
-
-              {habit.linked_goals && habit.linked_goals.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-granite-200">
-                  <p className="text-xs text-granite-500 mb-1">Linked to:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {habit.linked_goals.map((goal: any) => (
-                      <span
-                        key={goal.id}
-                        className="text-xs bg-summit-100 text-summit-700 px-2 py-1 rounded"
-                      >
-                        {goal.title}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };
