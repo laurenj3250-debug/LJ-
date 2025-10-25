@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { habitsAPI, logsAPI } from '../services/api';
 import type { Goal, Habit, DailyLog } from '../types';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { MountainLine, Carabiner, ClimbingHold } from './LineArt';
 
 interface WeekViewProps {
   goals: Goal[];
@@ -68,159 +69,161 @@ const WeekView: React.FC<WeekViewProps> = ({ goals, habits }) => {
   const weeklyGoals = goals.filter(g => g.goal_type === 'weekly' && g.status === 'active');
 
   return (
-    <div className="space-y-6">
-      {/* Week Goals Overview */}
-      {weeklyGoals.length > 0 && (
-        <div className="card">
-          <h2 className="text-2xl font-bold text-granite-800 mb-4 flex items-center">
-            <span className="mr-2">🧗</span>
-            This Week's Goals
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {weeklyGoals.map((goal) => (
-              <div key={goal.id} className="bg-gradient-to-r from-summit-50 to-summit-100 rounded-lg p-4 border border-summit-200">
-                <h4 className="font-semibold text-granite-800">{goal.title}</h4>
-                <div className="mt-2">
-                  <div className="w-full bg-white rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-summit-500 to-summit-600 h-2 rounded-full transition-all"
-                      style={{ width: `${goal.progress}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-granite-600 mt-1">{goal.progress}% complete</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Week Grid */}
-      <div className="card">
-        <h2 className="text-2xl font-bold text-granite-800 mb-6 flex items-center">
-          <span className="mr-2">📅</span>
-          Week Overview
-        </h2>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="border border-granite-300 bg-granite-100 p-3 text-left font-semibold text-granite-700 min-w-[150px]">
-                  Habit
-                </th>
-                {weekDays.map((day) => (
-                  <th
-                    key={day.toISOString()}
-                    className={`border border-granite-300 p-3 text-center min-w-[100px] ${
-                      isToday(day) ? 'bg-summit-100 font-bold' : 'bg-granite-50'
-                    }`}
-                  >
-                    <div className={isToday(day) ? 'text-summit-700' : 'text-granite-700'}>
-                      {format(day, 'EEE')}
+    <div className="journal-page">
+      <div className="journal-margin space-y-6">
+        {/* Week Goals Overview */}
+        {weeklyGoals.length > 0 && (
+          <div className="card">
+            <h2 className="text-xl font-display text-ink-800 mb-4 flex items-center tracking-wide">
+              <Carabiner className="w-6 h-6 mr-2 text-ink-600" />
+              This Week's Objectives
+            </h2>
+            <MountainLine className="w-full h-6 text-ink-300 mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {weeklyGoals.map((goal) => (
+                <div key={goal.id} className="bg-paper-100 p-4 border-l-2 border-ink-400">
+                  <h4 className="font-display text-ink-800">{goal.title}</h4>
+                  <div className="mt-2">
+                    <div className="w-full bg-paper-200 h-1">
+                      <div
+                        className="bg-ink-600 h-1 transition-all"
+                        style={{ width: `${goal.progress}%` }}
+                      />
                     </div>
-                    <div className={`text-sm ${isToday(day) ? 'text-summit-600' : 'text-granite-500'}`}>
+                    <p className="text-xs font-body text-ink-500 mt-1">{goal.progress}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Week Grid */}
+        <div className="card">
+          <h2 className="text-xl font-display text-ink-800 mb-6 flex items-center tracking-wide">
+            <ClimbingHold className="w-6 h-6 mr-2 text-ink-600" />
+            Habit Tracker
+          </h2>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="border border-ink-200 bg-paper-100 p-3 text-left font-display text-ink-700 min-w-[150px]">
+                    Habit
+                  </th>
+                  {weekDays.map((day) => (
+                    <th
+                      key={day.toISOString()}
+                      className={`border border-ink-200 p-3 text-center min-w-[100px] ${
+                        isToday(day) ? 'bg-ink-100 font-bold' : 'bg-paper-50'
+                      }`}
+                    >
+                      <div className={`font-body ${isToday(day) ? 'text-ink-900' : 'text-ink-700'}`}>
+                        {format(day, 'EEE')}
+                      </div>
+                      <div className={`text-sm font-body ${isToday(day) ? 'text-ink-600' : 'text-ink-500'}`}>
+                        {format(day, 'MMM d')}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {habits.map((habit) => (
+                  <tr key={habit.id}>
+                    <td className="border border-ink-200 p-3 bg-paper-50">
+                      <div className="flex items-center">
+                        <div
+                          className="w-2 h-2 mr-2"
+                          style={{ backgroundColor: habit.color }}
+                        />
+                        <span className="font-body text-ink-800">{habit.name}</span>
+                      </div>
+                    </td>
+                    {weekDays.map((day) => {
+                      const isLogged = isHabitLoggedForDay(habit.id, day);
+                      return (
+                        <td
+                          key={day.toISOString()}
+                          className={`border border-ink-200 p-2 text-center ${
+                            isToday(day) ? 'bg-ink-50' : 'bg-paper-50'
+                          }`}
+                        >
+                          <button
+                            onClick={() => !isLogged && logHabit(habit.id, day)}
+                            className={`w-8 h-8 transition-all font-body text-sm ${
+                              isLogged
+                                ? 'bg-ink-700 text-paper-50 border-2 border-ink-700'
+                                : 'bg-transparent border-2 border-ink-300 text-ink-400 hover:border-ink-500'
+                            }`}
+                            disabled={isLogged}
+                          >
+                            {isLogged ? '✓' : ''}
+                          </button>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {habits.length === 0 && (
+            <p className="text-center text-ink-400 italic py-8 font-body text-sm">
+              No habits to track yet
+            </p>
+          )}
+        </div>
+
+        {/* Daily Tasks Grid */}
+        <div className="card">
+          <h2 className="text-xl font-display text-ink-800 mb-6 flex items-center tracking-wide">
+            Daily Entries
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+            {weekDays.map((day) => {
+              const dayLogs = getLogsForDay(day);
+              return (
+                <div
+                  key={day.toISOString()}
+                  className={`p-4 border-l-2 ${
+                    isToday(day)
+                      ? 'border-ink-600 bg-ink-50'
+                      : 'border-ink-200 bg-paper-50'
+                  }`}
+                >
+                  <div className={`font-display mb-2 ${isToday(day) ? 'text-ink-900' : 'text-ink-700'}`}>
+                    {format(day, 'EEE')}
+                    <div className="text-sm font-body text-ink-500">
                       {format(day, 'MMM d')}
                     </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {habits.map((habit) => (
-                <tr key={habit.id}>
-                  <td className="border border-granite-300 p-3 bg-white">
-                    <div className="flex items-center">
-                      <div
-                        className="w-3 h-3 rounded-full mr-2"
-                        style={{ backgroundColor: habit.color }}
-                      />
-                      <span className="font-semibold text-granite-800">{habit.name}</span>
-                    </div>
-                  </td>
-                  {weekDays.map((day) => {
-                    const isLogged = isHabitLoggedForDay(habit.id, day);
-                    return (
-                      <td
-                        key={day.toISOString()}
-                        className={`border border-granite-300 p-2 text-center ${
-                          isToday(day) ? 'bg-summit-50' : 'bg-white'
-                        }`}
-                      >
-                        <button
-                          onClick={() => !isLogged && logHabit(habit.id, day)}
-                          className={`w-10 h-10 rounded-full transition-all ${
-                            isLogged
-                              ? 'bg-gradient-to-r from-summit-500 to-summit-600 text-white shadow-md'
-                              : 'bg-granite-100 hover:bg-granite-200 text-granite-400'
+                  </div>
+
+                  <div className="space-y-2">
+                    {dayLogs.length === 0 ? (
+                      <p className="text-xs text-ink-400 italic font-body">—</p>
+                    ) : (
+                      dayLogs.map((log) => (
+                        <div
+                          key={log.id}
+                          className={`text-xs p-2 border-l border-ink-300 font-body ${
+                            log.status === 'completed'
+                              ? 'line-through text-ink-400'
+                              : 'text-ink-700'
                           }`}
-                          disabled={isLogged}
                         >
-                          {isLogged ? '✓' : '○'}
-                        </button>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {habits.length === 0 && (
-          <p className="text-center text-granite-500 italic py-8">
-            No habits to track. Create some habits first!
-          </p>
-        )}
-      </div>
-
-      {/* Daily Tasks Grid */}
-      <div className="card">
-        <h2 className="text-2xl font-bold text-granite-800 mb-6 flex items-center">
-          <span className="mr-2">📋</span>
-          Daily Tasks
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-          {weekDays.map((day) => {
-            const dayLogs = getLogsForDay(day);
-            return (
-              <div
-                key={day.toISOString()}
-                className={`rounded-lg p-4 border-2 ${
-                  isToday(day)
-                    ? 'border-summit-400 bg-summit-50'
-                    : 'border-granite-200 bg-white'
-                }`}
-              >
-                <div className={`font-bold mb-2 ${isToday(day) ? 'text-summit-700' : 'text-granite-700'}`}>
-                  {format(day, 'EEE')}
-                  <div className="text-sm font-normal text-granite-500">
-                    {format(day, 'MMM d')}
+                          {log.content}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  {dayLogs.length === 0 ? (
-                    <p className="text-xs text-granite-400 italic">No tasks</p>
-                  ) : (
-                    dayLogs.map((log) => (
-                      <div
-                        key={log.id}
-                        className={`text-xs p-2 rounded ${
-                          log.status === 'completed'
-                            ? 'bg-summit-100 line-through text-granite-500'
-                            : 'bg-granite-50 text-granite-700'
-                        }`}
-                      >
-                        {log.content}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
