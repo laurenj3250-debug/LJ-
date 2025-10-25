@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO, isWithinInterval } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, parseISO, isWithinInterval } from 'date-fns';
 import type { Goal, Habit, HabitLog } from '../types';
 import { MountainLine, CornerSwirl, Carabiner } from '../components/LineArt';
 
@@ -31,7 +31,7 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
   // Get habit logs for a specific date
   const getHabitLogsForDate = (date: Date) => {
     return habitLogs.filter(log => {
-      const logDate = parseISO(log.log_date.toString());
+      const logDate = parseISO(log.date.toString());
       return isSameDay(logDate, date);
     });
   };
@@ -167,7 +167,7 @@ const MonthView: React.FC<MonthViewProps> = ({ goals, habits, habitLogs = [] }) 
                 {/* Habit completion indicators */}
                 {dayHabitLogs.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-auto">
-                    {dayHabitLogs.slice(0, 4).map((log, idx) => (
+                    {dayHabitLogs.slice(0, 4).map((_, idx) => (
                       <div
                         key={idx}
                         className="w-2 h-2 rounded-full bg-ink-400"
