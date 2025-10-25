@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { goalsAPI, habitsAPI } from '../services/api';
 import type { Goal, Habit } from '../types';
-import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, eachDayOfInterval, isSameDay, parseISO, differenceInDays } from 'date-fns';
+import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
 import { MountainLine, CornerSwirl, Carabiner, ClimbingHold, RopeSwirl } from '../components/LineArt';
 
 const Statistics: React.FC = () => {
